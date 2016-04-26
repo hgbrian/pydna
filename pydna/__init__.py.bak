@@ -18,13 +18,13 @@
 
 '''
 
-__author__       = "Björn Johansson"
-__copyright__    = "Copyright 2013 - 2015 Björn Johansson"
-__credits__      = ["Björn Johansson", "Mark Budde"]
-__license__      = "BSD"
-__maintainer__   = "Björn Johansson"
-__email__        = "bjorn_johansson@bio.uminho.pt"
-__status__       = "Development" # "Production" #"Prototype"
+__author__       = u"Björn Johansson"
+__copyright__    = u"Copyright 2013 - 2015 Björn Johansson"
+__credits__      = [u"Björn Johansson", u"Mark Budde"]
+__license__      = u"BSD"
+__maintainer__   = u"Björn Johansson"
+__email__        = u"bjorn_johansson@bio.uminho.pt"
+__status__       = u"Development" # "Production" #"Prototype"
 from ._version import get_versions
 __version__      = get_versions()['version'][:5]
 __long_version__ = get_versions()['version']
@@ -71,7 +71,7 @@ os.environ["pydna_cache"] = os.getenv("pydna_cache") or "cached"
 if os.environ["pydna_cache"] not in ("cached", "nocache", "refresh", "compare"):
     raise Exception("cache (os.environ['pydna_cache']) is not either cached, nocache, refresh or compare")
 
-os.environ["pydna_data_dir"] = os.getenv("pydna_data_dir") or appdirs.user_data_dir("pydna") #.encode(sys.getfilesystemencoding())
+os.environ["pydna_data_dir"] = os.getenv("pydna_data_dir") or appdirs.user_data_dir("pydna").encode(sys.getfilesystemencoding())
 
 # create data directory
 
@@ -214,7 +214,7 @@ def delete_cache(delete=[ "amplify", "assembly", "genbank", "web", "synced" ]):
         try:
             os.remove( os.path.join( os.environ["pydna_data_dir"], file_) )
             msg += " deleted.\n"
-        except OSError as e:
+        except OSError, e:
             if e.errno == errno.ENOENT:
                 msg += " no file to delete.\n"
     return pretty_str(msg)

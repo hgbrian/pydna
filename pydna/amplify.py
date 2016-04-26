@@ -7,7 +7,7 @@ circular templates are handled correctly.
 
 '''
 
-import cPickle
+import pickle
 import shelve
 
 import itertools
@@ -31,7 +31,7 @@ from Bio.SeqFeature                 import CompoundLocation
 from Bio.SeqFeature                 import FeatureLocation
 from pydna.dsdna                    import rc
 from pydna.dsdna                    import Dseqrecord
-from pydna.pretty                   import pretty_str, pretty_unicode
+from pydna.pretty                   import pretty_str #, pretty_unicode
 
 
 def _annealing_positions(primer, template, limit=15):
@@ -332,7 +332,7 @@ class Amplicon(Dseqrecord):
         # Fermentas recombinant taq
         taq_extension_rate = 30  # seconds/kB PCR product length
         extension_time_taq = taq_extension_rate * len(self) / 1000 # seconds
-        f  = textwrap.dedent(u'''
+        f  = textwrap.dedent( '''
                                  Taq (rate {rate} nt/s) 35 cycles             |{size}bp
                                  95.0°C    |95.0°C                 |      |SantaLucia 1998
                                  |_________|_____          72.0°C  |72.0°C|SaltC {saltc:2}mM
@@ -345,7 +345,7 @@ class Amplicon(Dseqrecord):
                                             *divmod(extension_time_taq,60),
                                             size = len(self.seq)))
 
-        return pretty_unicode(f)
+        return pretty_str(f)
 
     def taq_program(self):
         return self.program()
@@ -498,7 +498,7 @@ class Anneal(object):
         key = str(template.seguid()) + "|".join(sorted([seguid(p.seq) for p in primers]))+str(limit)
 
         if os.environ["pydna_cache"] in ("compare", "cached"):
-            cache = shelve.open(os.path.join(os.environ["pydna_data_dir"], "amplify"), protocol=cPickle.HIGHEST_PROTOCOL, writeback=False)
+            cache = shelve.open(os.path.join(os.environ["pydna_data_dir"], "amplify"), protocol=pickle.HIGHEST_PROTOCOL, writeback=False)
             try:
                 cached = cache[key]
             except:
@@ -606,7 +606,7 @@ class Anneal(object):
             module_logger.warning('amplify error')
 
     def _save(self):
-        cache = shelve.open(os.path.join(os.environ["pydna_data_dir"], "amplify"), protocol=cPickle.HIGHEST_PROTOCOL, writeback=False)
+        cache = shelve.open(os.path.join(os.environ["pydna_data_dir"], "amplify"), protocol=pickle.HIGHEST_PROTOCOL, writeback=False)
         cache[self.key] = self
         cache.close()
 

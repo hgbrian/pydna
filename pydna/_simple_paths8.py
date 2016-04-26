@@ -103,27 +103,27 @@ if __name__=='__main__':
     target = 'd'
 
     # MULTIDIGRAPH
-    print 'MULTIDIGRAPH (data=False)'
+    print('MULTIDIGRAPH (data=False)')
     for path in all_simple_paths_edges(G, source, target):
-        print path
+        print(path)
 
     print
-    print 'MULTIDIGRAPH (data=True)'
+    print('MULTIDIGRAPH (data=True)')
     for path in all_simple_paths_edges(G, source, target, data=True):
         #print path
         total_weight = sum([(I.values()[0]['weight']) for u,v,I in path])
-        print total_weight, '\t', path
+        print(total_weight, '\t', path)
 
     print
     # DIGRAPH
     H = nx.DiGraph(G)
-    print 'DIGRAPH (data=False)'
+    print('DIGRAPH (data=False)')
     for path in all_simple_paths_edges(H, source, target):
-        print path
+        print(path)
 
     print
-    print 'DIGRAPH (data=True)'
+    print('DIGRAPH (data=True)')
     for path in all_simple_paths_edges(H, source, target, data=True):
         total_weight = sum([w['weight'] for u,v,w in path])
-        print total_weight, '\t', path
+        print(total_weight, '\t', path)
 

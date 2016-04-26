@@ -12,7 +12,7 @@ Seq and SeqRecord classes, respectively. These classes support the
 notion of circular and linear DNA.
 
 '''
-import cPickle
+import pickle
 import shelve
 
 import copy
@@ -21,12 +21,17 @@ import itertools
 import operator
 import os
 import re
-import StringIO
+#import StringIO
 import sys
 import textwrap
 import math
 import glob
 import colorsys
+
+try:
+    from io import StringIO
+except ImportError:
+    from io import StringIO
 
 from warnings import warn
 
@@ -48,7 +53,7 @@ from Bio.SeqUtils           import GC
 from Bio.GenBank            import RecordParser
 from Bio.Data.CodonTable    import TranslationError
 
-from _sequencetrace         import SequenceTraceFactory
+from ._sequencetrace         import SequenceTraceFactory
 
 from pydna.findsubstrings_suffix_arrays_python import common_sub_strings
 from pydna.utils  import seguid  as seg
@@ -348,7 +353,7 @@ class Dseq(Seq):
                 ovhgs = [ol[1]-ol[0] for ol in olaps if ol[2]==L]
                 if len(ovhgs)>1:
                     for o in ovhgs:
-                        print o
+                        print(o)
                     raise Exception("More than one way of annealing the strands "
                                     "ovhg should be provided")
 
@@ -365,8 +370,8 @@ class Dseq(Seq):
         sns = ((self._ovhg*" ")  + str(self.watson))
         asn = ((-self._ovhg*" ") + str(rc(self.crick)))
 
-        self.todata = "".join([a.strip() or b.strip() for a,b in itertools.izip_longest(sns,asn, fillvalue=" ")])
-        self.dsdata = "".join([a for a, b in itertools.izip_longest(sns,asn, fillvalue=" ") if a.lower()==b.lower()])
+        self.todata = "".join([a.strip() or b.strip() for a,b in itertools.zip_longest(sns,asn, fillvalue=" ")])
+        self.dsdata = "".join([a for a, b in itertools.zip_longest(sns,asn, fillvalue=" ") if a.lower()==b.lower()])
 
         if circular == None and linear in (True, False,):
             self._linear   = linear
@@ -404,7 +409,7 @@ class Dseq(Seq):
 
 
 
-    def find(self, sub, start=0, end=sys.maxint):
+    def find(self, sub, start=0, end=sys.maxsize):      #sys.maxint
         """Find method, like that of a python string.
 
         This behaves like the python string method of the same name.
@@ -1107,7 +1112,7 @@ class Dseq(Seq):
                     watson_fragments[-1] = watson_fragments[-1][:-1]
                     crick_fragments[0]   = crick_fragments[0][:-1]
 
-                    s = zip(watson_fragments, crick_fragments)
+                    s = list(zip(watson_fragments, crick_fragments))
 
                     if frag.linear:
                         newfrags.append(Dseq(*s.pop(0),
@@ -1383,7 +1388,7 @@ class Dseqrecord(SeqRecord):
         except AttributeError:
             pass
 
-        if isinstance(record, basestring):  # record is a string
+        if isinstance(record, str):  # record is a string
             SeqRecord.__init__(self,
                                Dseq(record,
                                     rc(record),
@@ -1393,7 +1398,7 @@ class Dseqrecord(SeqRecord):
                                *args,
                                **kwargs)
         elif hasattr(record, "features"): # record is SeqRecord or Dseqrecord?
-            for key, value in record.__dict__.items():
+            for key, value in list(record.__dict__.items()):
                 setattr(self, key, value )
             if hasattr(record.seq, "watson"): # record.seq is a Dseq, so record is Dseqrecord
                 new_seq = copy.copy(record.seq)
@@ -1628,16 +1633,15 @@ class Dseqrecord(SeqRecord):
         return self.features[n].extract(self)
 
     def spread_ape_colors(self):
-    	''' This method assigns random colors compatible with the ApE editor
-    	to features.
-    	'''
-
+        ''' This method assigns random colors compatible with the ApE editor
+            to features.
+        '''
         def get_N_HexCol(N):
-            HSV_tuples = [(x*1.0/N, 0.5, 0.5) for x in xrange(N)]
+            HSV_tuples = [(x*1.0/N, 0.5, 0.5) for x in range(N)]
             hex_out = []
             for rgb in HSV_tuples:
-                rgb = map(lambda x: int(x*255),colorsys.hsv_to_rgb(*rgb))
-                hex_out.append("".join(map(lambda x: chr(x).encode('hex'),rgb)))
+                rgb = [int(x*255) for x in colorsys.hsv_to_rgb(*rgb)]
+                hex_out.append("".join([chr(x).encode('hex') for x in rgb]))
             return hex_out
 
         for i, color in enumerate(get_N_HexCol(len(self.features))):
@@ -1683,7 +1687,7 @@ class Dseqrecord(SeqRecord):
         return pretty_str(x)
 
     def gc(self):
-    	'''Returns GC content '''
+        '''Returns GC content '''
         return pretty_string(round(GC(str(self.seq)), 1))
 
     def cseguid(self):
@@ -1730,11 +1734,11 @@ class Dseqrecord(SeqRecord):
         >>> import pydna
         >>> a=pydna.Dseqrecord("agtatcgtacatg")
         >>> a.lseguid() # cseguid is CTJbs6Fat8kLQxHj+/SC0kGEiYs
-        'QFuP3noYs92MGFJ2YGymCrxXFU4'
+        'DPshMN4KeAjMovEjGEV4Kzj18lU'
 
         >>> b=pydna.Dseqrecord("catgtacgatact")
         >>> a.lseguid()
-        'QFuP3noYs92MGFJ2YGymCrxXFU4'
+        'DPshMN4KeAjMovEjGEV4Kzj18lU'
 
        '''
         if self.circular:
@@ -1884,7 +1888,7 @@ class Dseqrecord(SeqRecord):
         pydna.dsdna.Dseq.looped
         '''
         new = copy.copy(self)
-        for key, value in self.__dict__.items():
+        for key, value in list(self.__dict__.items()):
             setattr(new, key, value )
         new._seq = self.seq.looped()
         for fn, fo in zip(new.features, self.features):
@@ -1911,7 +1915,7 @@ class Dseqrecord(SeqRecord):
         '''
 
         new = copy.copy(self)
-        for key, value in self.__dict__.items():
+        for key, value in list(self.__dict__.items()):
             setattr(new, key, value )
         new._seq = self.seq.tolinear()
         for fn, fo in zip(new.features, self.features):
@@ -1991,7 +1995,7 @@ class Dseqrecord(SeqRecord):
         if not filename:
             filename = "{name}.{type}".format(name=self.description, type=f)
             # invent a name if none given
-        if isinstance(filename, basestring):
+        if isinstance(filename, str):
             name, ext = os.path.splitext(filename)
             result = "### [{name}]({filename})".format(name=name, filename=filename)
             if os.path.isfile(filename):
@@ -2105,7 +2109,7 @@ class Dseqrecord(SeqRecord):
         for name in glob.glob(pth):
             traces.append( stf.loadTraceFile( name ))
         if not traces:
-            raise(Exception("no trace files found!"))
+            raise Exception
         if hasattr( self.map_target, "step" ):
             area = self.map_target
         elif hasattr( self.map_target, "extract" ):
@@ -2572,7 +2576,7 @@ class Dseqrecord(SeqRecord):
         key = str(self.seguid())+"|"+rs+"|"+str(limit)
 
         if csh in ("compare", "cached"):
-            cache = shelve.open(os.path.join(os.environ["pydna_data_dir"],"synced"), protocol=cPickle.HIGHEST_PROTOCOL, writeback=False)
+            cache = shelve.open(os.path.join(os.environ["pydna_data_dir"],"synced"), protocol=pickle.HIGHEST_PROTOCOL, writeback=False)
             try:
                 cached = cache[str(key)]
             except:

@@ -9,7 +9,7 @@ sequences separating the overlapping regions form edges.
 
 '''
 
-import cPickle
+import pickle
 import shelve
 
 import logging
@@ -24,20 +24,20 @@ import os
 from copy import copy
 from textwrap import dedent
 from collections import defaultdict
-from collections import namedtuple
+#from collections import namedtuple
 
-from Bio.SeqFeature import ExactPosition
+#from Bio.SeqFeature import ExactPosition
 from Bio.SeqFeature import FeatureLocation
 from Bio.SeqFeature import SeqFeature
 
 from pydna.dsdna import Dseq
 from pydna.dsdna import Dseqrecord
 from pydna._simple_paths8 import all_simple_paths_edges, all_circular_paths_edges
-from findsubstrings_suffix_arrays_python import common_sub_strings
-from findsubstrings_suffix_arrays_python import terminal_overlap
+from .findsubstrings_suffix_arrays_python import common_sub_strings
+from .findsubstrings_suffix_arrays_python import terminal_overlap
 
-from orderedset import OrderedSet
-from pydna.pretty                   import pretty_str
+from .orderedset import OrderedSet
+from .pretty import pretty_str
 
 
 
@@ -274,7 +274,7 @@ class Assembly(object):
 
             module_logger.info('open shelf file {}'.format(os.path.join(os.environ["pydna_data_dir"],"assembly")))
 
-            cache = shelve.open(os.path.join(os.environ["pydna_data_dir"], "assembly"), protocol=cPickle.HIGHEST_PROTOCOL, writeback=False)
+            cache = shelve.open(os.path.join(os.environ["pydna_data_dir"], "assembly"), protocol=pickle.HIGHEST_PROTOCOL, writeback=False)
 
             module_logger.info('created key = {}'.format(key))
             module_logger.info( "pydna_cache = {}".format(os.environ["pydna_cache"]) )
@@ -318,7 +318,7 @@ class Assembly(object):
             module_logger.warning('Assembly error')
 
     def _save(self):
-        cache = shelve.open(os.path.join(os.environ["pydna_data_dir"], "assembly"), protocol=cPickle.HIGHEST_PROTOCOL, writeback=False)
+        cache = shelve.open(os.path.join(os.environ["pydna_data_dir"], "assembly"), protocol=pickle.HIGHEST_PROTOCOL, writeback=False)
         cache[self.key] = self
         cache.close()
 

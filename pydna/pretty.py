@@ -8,9 +8,9 @@ class pretty_str(str):
     def _repr_pretty_(self, p, cycle):
         p.text(self)
 
-class pretty_unicode(unicode):
-    def _repr_pretty_(self, p, cycle):
-        p.text(self)
+#class pretty_unicode(unicode):
+#    def _repr_pretty_(self, p, cycle):
+#        p.text(self)
 
 class pretty_string(str):
     def _repr_pretty_(self, p, cycle):
@@ -19,8 +19,8 @@ class pretty_string(str):
 if __name__=="__main__":
     import pydna
 
-    print pydna.read("/home/bjorn/Desktop/python_packages/pydna/pydna/pydna_read_test.txt").format()
-    print pydna.read("/home/bjorn/Desktop/python_packages/pydna/pydna/pydna_read_test2.txt").format()[3270:3281]
+    print(pydna.read("/home/bjorn/Desktop/python_packages/pydna/pydna/pydna_read_test.txt").format())
+    print(pydna.read("/home/bjorn/Desktop/python_packages/pydna/pydna/pydna_read_test2.txt").format()[3270:3281])
     import sys;sys.exit(42)
     import StringIO
     from Bio import SeqIO
@@ -40,11 +40,11 @@ if __name__=="__main__":
 
     s = sr.format("gb").strip()
 
-    print pretty_string(s[:55]+"circular"+s[63:])[3200:3300]
+    print(pretty_string(s[:55]+"circular"+s[63:])[3200:3300])
 
     from pydna import Dseqrecord
 
     v = Dseqrecord(sr)
 
-    print v.format("gb")
+    print(v.format("gb"))
 

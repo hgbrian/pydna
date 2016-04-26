@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from tools_karkkainen_sanders import direct_kark_sort
+from .tools_karkkainen_sanders import direct_kark_sort
 from array import array
 
 class Rstr_max :
@@ -11,18 +11,18 @@ class Rstr_max :
 
   def add_str(self, str_unicode) :
     self.array_str.append(str_unicode)
-    
+
   def step1_sort_suffix(self) :
     char_frontier = chr(2)
 
     self.global_suffix = char_frontier.join(self.array_str)
-    
+
     nbChars = len(self.global_suffix)
     init = [-1]*nbChars
     self.idxString = array('i', init)
     self.idxPos = array('i', init)
     self.endAt = array('i', init)
-    
+
     k = idx = 0
     for mot in self.array_str :
       last = k + len(mot)
@@ -41,7 +41,7 @@ class Rstr_max :
     init = [0]*n
     rank = array('i', init)
     LCP = array('i', init)
-    
+
     s = self.global_suffix
     suffix_array = self.res
     endAt = self.endAt
@@ -59,7 +59,7 @@ class Rstr_max :
       if i:
         while l + j < endAt[j] and l + j2 < endAt[j2] and s[j+l] == s[j2+l]:
           l += 1
-        LCP[i-1] = l 
+        LCP[i-1] = l
       else:
         l = 0
     self.lcp = LCP
@@ -91,7 +91,7 @@ class Rstr_max :
       #offset2 = self.idxPos[pos2]
       #idStr2 = self.idxString[pos2]
       #offset2, idStr2  = self.array_suffix[idx+1]
-      end_ = max(pos1, pos2) + current_len# max(pos1, pos2) + current_len 
+      end_ = max(pos1, pos2) + current_len# max(pos1, pos2) + current_len
 #      e = max((idStr1, offset1), (idStr2, offset2))
 #      end_ = (e[0],e[1]+current_len)
       n = prev_len - current_len
@@ -109,7 +109,7 @@ class Rstr_max :
       pos1 = pos2
       #offset1 = offset2
       #idStr1 = idStr2
-      
+
     if(stack._top > 0) :
       self.removeMany(stack, results, stack._top, idx+1)
 
@@ -130,8 +130,8 @@ class Rstr_max :
         stack._top -= n
       if m < 0:
         stack.lst_max.append([-m, idxStart, maxEnd-n-m])
-        stack._top -= m    
-    
+        stack._top -= m
+
   def go(self) :
 #    import time
 #    t_start = t0 = time.time()
@@ -156,4 +156,4 @@ if (__name__ == '__main__') :
   r = rstr.go()
   for ((id_str, end), nb), (l, start_plage) in r.iteritems():
     ss = rstr.array_str[id_str][end-l:end]
-    print '[%s] %d'%(ss.encode('utf-8'), nb)
+    print('[%s] %d'%(ss.encode('utf-8'), nb))
